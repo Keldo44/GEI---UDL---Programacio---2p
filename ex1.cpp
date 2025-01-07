@@ -2,137 +2,136 @@
 #include <ctype.h>
 #include <string.h>
 
-#define MAX_WORD_LENGTH 21
-#define MAX_SPAM_WORDS 100
+#define MAX_LONGITUD_PARAULA 21
+#define MAX_PARAULES_SPAM 100
 
-// Function to skip invalid characters and return the next valid character (alphabet or dot)
-char skip_non_alphabetic()
+// Funció per saltar caràcters invàlids i retornar el següent caràcter vàlid (lletra o punt)
+char saltar_no_alfabetic()
 {
     char c;
     while ((c = getchar()) != EOF)
     {
         if (isalpha(c) || c == '.')
         {
-            return c; // Return valid character (alphabet or dot)
+            return c; // Retorna el caràcter vàlid (lletra o punt)
         }
     }
-    return EOF; // End of input
+    return EOF; // Fi de l'entrada
 }
 
-// Function to read the next word or dot sequence
-void read_next_word(char word[], bool end)
+// Funció per llegir la següent paraula o seqüència de punts
+void llegir_següent_paraula(char paraula[], bool final)
 {
-
-    word[0] = '\0';
-    char c = skip_non_alphabetic(); // Get the first valid character
+    paraula[0] = '\0';
+    char c = saltar_no_alfabetic(); // Obté el primer caràcter vàlid
     int i = 0;
-    int ended_word = 0;
-    if (end)
+    int finalitzada_paraula = 0;
+    if (final)
     {
-        ended_word == 1;
-        word[1] = '\0';
+        finalitzada_paraula = 1;
+        paraula[1] = '\0';
     }
 
-    while (c != EOF && i < MAX_WORD_LENGTH - 1 && ended_word != 1)
+    while (c != EOF && i < MAX_LONGITUD_PARAULA - 1 && finalitzada_paraula != 1)
     {
         if (c == '.')
         {
-            if (i == 0 || word[0] == '.')
+            if (i == 0 || paraula[0] == '.')
             {
-                word[i] = c;
+                paraula[i] = c;
                 i++;
-                if (word[1] == '.')
+                if (paraula[1] == '.')
                 {
-                    ended_word = 1;
+                    finalitzada_paraula = 1;
                 }
             }
             else
             {
-                // Otherwise, stop when a dot follows an alphabetic character
-                ungetc(c, stdin); // Put the character back into the input stream
-                ended_word = 1;
+                // Atura si un punt segueix una lletra alfabètica
+                ungetc(c, stdin); // Torna a posar el caràcter a l'entrada
+                finalitzada_paraula = 1;
             }
         }
         else if (isalpha(c))
         {
-            // If it's an alphabetic character, store it in lowercase
-            if (word[0] == '.')
+            // Si és una lletra alfabètica, emmagatzema-la en minúscula
+            if (paraula[0] == '.')
             {
-                ungetc(c, stdin); // Put the character back into the input
-                ended_word = 1;
+                ungetc(c, stdin); // Torna a posar el caràcter a l'entrada
+                finalitzada_paraula = 1;
             }
             else
             {
-                word[i++] = tolower(c);
+                paraula[i++] = tolower(c);
             }
         }
         else
         {
-            // If it's a separator, stop processing
-            if (word[0] == '.')
+            // Si és un separador, atura el processament
+            if (paraula[0] == '.')
             {
-                c = skip_non_alphabetic();
+                c = saltar_no_alfabetic();
                 if (c != '.')
                 {
-                    ungetc(c, stdin); // Put the character back into the input stream
-                    ended_word = 1;
+                    ungetc(c, stdin); // Torna a posar el caràcter a l'entrada
+                    finalitzada_paraula = 1;
                 }
             }
             else
             {
-                ended_word = 1;
+                finalitzada_paraula = 1;
             }
         }
-        c = getchar(); // Read the next character
+        c = getchar(); // Llegeix el següent caràcter
     }
-    if (!end)
+    if (!final)
     {
-        ungetc(c, stdin); // Put the character back into the input
-        word[i] = '\0';   // Null-terminate the string
-        if (word[2] == '.')
+        ungetc(c, stdin); // Torna a posar el caràcter a l'entrada
+        paraula[i] = '\0';   // Finalitza la cadena
+        if (paraula[2] == '.')
         {
-            word[2] = '\0';
+            paraula[2] = '\0';
         }
     }
 }
 
-void init_word_list(char list[MAX_SPAM_WORDS][MAX_WORD_LENGTH + 1])
+void inicialitzar_llista_paraules(char llista[MAX_PARAULES_SPAM][MAX_LONGITUD_PARAULA + 1])
 {
-    for (int i = 0; i < MAX_SPAM_WORDS; i++)
+    for (int i = 0; i < MAX_PARAULES_SPAM; i++)
     {
-        list[i][0] = '\0';
+        llista[i][0] = '\0';
     }
 }
 
-int fill_spam_list(char list[MAX_SPAM_WORDS][MAX_WORD_LENGTH + 1], char word[MAX_WORD_LENGTH], int &word_count)
+int omplir_llista_spam(char llista[MAX_PARAULES_SPAM][MAX_LONGITUD_PARAULA + 1], char paraula[MAX_LONGITUD_PARAULA], int &num_paraules)
 {
-    bool dot_found = false;
-    while (!dot_found)
+    bool punt_trobat = false;
+    while (!punt_trobat)
     {
-        read_next_word(word, false);
-        if (strcmp(".", word) == 0)
+        llegir_següent_paraula(paraula, false);
+        if (strcmp(".", paraula) == 0)
         {
-            dot_found = true;
+            punt_trobat = true;
         }
         else
         {
-            // Check if the word is already in the list
-            int is_duplicate = 0;
-            for (int j = 0; j < word_count; j++)
+            // Comprova si la paraula ja està a la llista
+            int es_duplicat = 0;
+            for (int j = 0; j < num_paraules; j++)
             {
-                if (strcmp(list[j], word) == 0)
+                if (strcmp(llista[j], paraula) == 0)
                 {
-                    is_duplicate = 1;
+                    es_duplicat = 1;
                 }
             }
 
-            // If the word is not a duplicate, add it to the list
-            if (!is_duplicate)
+            // Si la paraula no és un duplicat, afegeix-la a la llista
+            if (!es_duplicat)
             {
-                strcpy(list[word_count++], word);
-                if (word_count == MAX_SPAM_WORDS)
+                strcpy(llista[num_paraules++], paraula);
+                if (num_paraules == MAX_PARAULES_SPAM)
                 {
-                    printf("Spam word list is full. Aborting...\n");
+                    printf("La llista de paraules spam és plena. Abortant...\n");
                     return 2;
                 }
             }
@@ -141,74 +140,74 @@ int fill_spam_list(char list[MAX_SPAM_WORDS][MAX_WORD_LENGTH + 1], char word[MAX
     return 0;
 }
 
-void count_message_spam_words(char list[MAX_SPAM_WORDS][MAX_WORD_LENGTH + 1], char word[MAX_WORD_LENGTH], int counts[MAX_SPAM_WORDS], int word_count)
+void comptar_paraules_spam_missatge(char llista[MAX_PARAULES_SPAM][MAX_LONGITUD_PARAULA + 1], char paraula[MAX_LONGITUD_PARAULA], int comptadors[MAX_PARAULES_SPAM], int num_paraules)
 {
-    bool doble_dot_found = false;
-    while (!doble_dot_found)
+    bool doble_punt_trobat = false;
+    while (!doble_punt_trobat)
     {
-        read_next_word(word, false);
-        if (strcmp("..", word) == 0)
+        llegir_següent_paraula(paraula, false);
+        if (strcmp("..", paraula) == 0)
         {
-            doble_dot_found = true;
+            doble_punt_trobat = true;
         }
         else
         {
-            // compare word with every word in list and count it in counts
-            for (int i = 0; i < word_count; i++)
+            // Compara la paraula amb cada paraula de la llista i compta-la als comptadors
+            for (int i = 0; i < num_paraules; i++)
             {
-                if (strcmp(word, list[i]) == 0)
+                if (strcmp(paraula, llista[i]) == 0)
                 {
-                    counts[i]++;
+                    comptadors[i]++;
                 }
             }
         }
     }
 }
 
-void print_results(char list[MAX_SPAM_WORDS][MAX_WORD_LENGTH + 1], int counts[MAX_SPAM_WORDS], int word_count)
+void imprimir_resultats(char llista[MAX_PARAULES_SPAM][MAX_LONGITUD_PARAULA + 1], int comptadors[MAX_PARAULES_SPAM], int num_paraules)
 {
     printf("Introdueix les paraules a identificar:\n");
     printf("Introdueix el text acabat en doble punt (..):\n");
-    printf("Relacio de paraules buscades:\n");
-    int spamed_words = 0;
-    // for each word on the list see if had appeared twce or more
-    for (int i = 0; i < word_count; i++)
+    printf("Relació de paraules buscades:\n");
+    int paraules_spamejades = 0;
+    // Per a cada paraula de la llista, comprova si ha aparegut dues vegades o més
+    for (int i = 0; i < num_paraules; i++)
     {
-        // desitred output
+        // Sortida desitjada
         // La paraula "qwert" apareix 0 vegada/es
-        printf("La paraula \"%s\" apareix %d vegada/es\n", list[i], counts[i]);
-        if (counts[i] >= 2)
+        printf("La paraula \"%s\" apareix %d vegada/es\n", llista[i], comptadors[i]);
+        if (comptadors[i] >= 2)
         {
-            spamed_words++;
+            paraules_spamejades++;
         }
     }
 
     printf("Resultat:\n");
-    printf("Rati: paraules amb 2 o mes aparicions / total de paraules = %d / %d = %.3f\n", spamed_words, word_count, (float)spamed_words / word_count);
-    if (spamed_words >= (word_count / 2))
+    printf("Rati: paraules amb 2 o més aparicions / total de paraules = %d / %d = %.3f\n", paraules_spamejades, num_paraules, (float)paraules_spamejades / num_paraules);
+    if (paraules_spamejades >= (num_paraules / 2))
     {
-        printf("El missatge es SPAM!\n");
+        printf("El missatge és SPAM!\n");
     }
     else
     {
-        printf("El missatge no es SPAM.\n");
+        printf("El missatge no és SPAM.\n");
     }
 }
 
 int main()
 {
-    char word[MAX_WORD_LENGTH];
-    char words[MAX_SPAM_WORDS][MAX_WORD_LENGTH + 1];
-    int counts[MAX_SPAM_WORDS] = {0};
-    int word_count = 0;
-    bool end = false;
+    char paraula[MAX_LONGITUD_PARAULA];
+    char paraules[MAX_PARAULES_SPAM][MAX_LONGITUD_PARAULA + 1];
+    int comptadors[MAX_PARAULES_SPAM] = {0};
+    int num_paraules = 0;
+    bool final = false;
 
-    init_word_list(words);
-    if (fill_spam_list(words, word, word_count) == 2)
+    inicialitzar_llista_paraules(paraules);
+    if (omplir_llista_spam(paraules, paraula, num_paraules) == 2)
     {
         return 0;
     }
-    count_message_spam_words(words, word, counts, word_count);
-    print_results(words, counts, word_count);
+    comptar_paraules_spam_missatge(paraules, paraula, comptadors, num_paraules);
+    imprimir_resultats(paraules, comptadors, num_paraules);
     return 0;
 }
