@@ -76,7 +76,6 @@ void llegir_següent_paraula(char paraula[], bool final)
                     ungetc(c, stdin); // Torna a posar el caràcter a l'entrada
                     finalitzada_paraula = 1;
                 }else{
-                    else{
                     paraula[i] = c;
                     i++;
                     finalitzada_paraula = 1;
